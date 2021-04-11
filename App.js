@@ -31,6 +31,8 @@ export default class CameraScreen extends React.Component {
     faces: [],
   };
 
+
+  // fungsi snap gambar
   takePicture = async function() {
     if (this.camera) {
       const data = await this.camera.takePictureAsync();
@@ -38,12 +40,10 @@ export default class CameraScreen extends React.Component {
     }
   };
 
-
-  toggle = value => () => this.setState(prevState => ({ [value]: !prevState[value] }));
-
+  // merubah nilai facesDetected
   facesDetected = ({ faces }) => this.setState({ faces });
 
-
+  // merender kotakan dan keterangan dari face
   renderFace = ({ bounds, faceID, rollAngle, yawAngle }) => (
     <View
       key={faceID}
@@ -67,6 +67,7 @@ export default class CameraScreen extends React.Component {
     </View>
   );
 
+  // merender landmark dari face yang terdeteksi
   renderLandmarksOfFace(face) {
     const renderLandmark = position =>
       position && (
@@ -97,21 +98,21 @@ export default class CameraScreen extends React.Component {
     );
   }
 
+  // untuk merender faces 
   renderFaces = () => (
     <View style={styles.facesContainer} pointerEvents="none">
       {this.state.faces.map(this.renderFace)}
     </View>
   );
 
+  // untuk merender landmarks
   renderLandmarks = () => (
     <View style={styles.facesContainer} pointerEvents="none">
       {this.state.faces.map(this.renderLandmarksOfFace)}
     </View>
   );
 
-
-
-
+  // untuk merender kamera dari parameter2 di atas
   renderCamera() {
     const { canDetectFaces, canDetectText, canDetectBarcode } = this.state;
     return (
