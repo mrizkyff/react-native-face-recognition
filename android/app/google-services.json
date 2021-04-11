@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "975301802533",
+    "project_id": "react-bpjs",
+    "storage_bucket": "react-bpjs.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:975301802533:android:01ff1bf5b69481cb165dcc",
+        "android_client_info": {
+          "package_name": "com.awesomeproject"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "975301802533-0i3l6ll8cabces5s0rbs28oai6gj24m2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCRHK_TPc8a4gscEtiGUx9qMP9gfzB3dJc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "975301802533-0i3l6ll8cabces5s0rbs28oai6gj24m2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
