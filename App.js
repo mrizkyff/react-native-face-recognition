@@ -24,68 +24,12 @@ const landmarkSize = 2;
 
 export default class CameraScreen extends React.Component {
   state = {
-    // flash: 'off',
-    // zoom: 0,
-    // autoFocus: 'on',
-    // depth: 0,
-    // type: 'back',
-    // whiteBalance: 'auto',
-    // ratio: '16:9',
-    // recordOptions: {
-    //   mute: false,
-    //   maxDuration: 5,
-    //   quality: RNCamera.Constants.VideoQuality['288p'],
-    // },
-    // isRecording: false,
-    canDetectFaces: false,
+    type: 'front',
+    canDetectFaces: 1,
     canDetectText: false,
     canDetectBarcode: false,
     faces: [],
-    // textBlocks: [],
-    // barcodes: [],
   };
-
-  toggleFacing() {
-    this.setState({
-      type: this.state.type === 'back' ? 'front' : 'back',
-    });
-  }
-
-  toggleFlash() {
-    this.setState({
-      flash: flashModeOrder[this.state.flash],
-    });
-  }
-
-  toggleWB() {
-    this.setState({
-      whiteBalance: wbOrder[this.state.whiteBalance],
-    });
-  }
-
-  toggleFocus() {
-    this.setState({
-      autoFocus: this.state.autoFocus === 'on' ? 'off' : 'on',
-    });
-  }
-
-  zoomOut() {
-    this.setState({
-      zoom: this.state.zoom - 0.1 < 0 ? 0 : this.state.zoom - 0.1,
-    });
-  }
-
-  zoomIn() {
-    this.setState({
-      zoom: this.state.zoom + 0.1 > 1 ? 1 : this.state.zoom + 0.1,
-    });
-  }
-
-  setFocusDepth(depth) {
-    this.setState({
-      depth,
-    });
-  }
 
   takePicture = async function() {
     if (this.camera) {
@@ -94,26 +38,11 @@ export default class CameraScreen extends React.Component {
     }
   };
 
-  takeVideo = async function() {
-    if (this.camera) {
-      try {
-        const promise = this.camera.recordAsync(this.state.recordOptions);
-
-        if (promise) {
-          this.setState({ isRecording: true });
-          const data = await promise;
-          this.setState({ isRecording: false });
-          console.warn('takeVideo', data);
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    }
-  };
 
   toggle = value => () => this.setState(prevState => ({ [value]: !prevState[value] }));
 
   facesDetected = ({ faces }) => this.setState({ faces });
+
 
   renderFace = ({ bounds, faceID, rollAngle, yawAngle }) => (
     <View
@@ -180,59 +109,8 @@ export default class CameraScreen extends React.Component {
     </View>
   );
 
-  renderTextBlocks = () => (
-    <View style={styles.facesContainer} pointerEvents="none">
-      {this.state.textBlocks.map(this.renderTextBlock)}
-    </View>
-  );
 
-  renderTextBlock = ({ bounds, value }) => (
-    <React.Fragment key={value + bounds.origin.x}>
-      <Text style={[styles.textBlock, { left: bounds.origin.x, top: bounds.origin.y }]}>
-        {value}
-      </Text>
-      <View
-        style={[
-          styles.text,
-          {
-            ...bounds.size,
-            left: bounds.origin.x,
-            top: bounds.origin.y,
-          },
-        ]}
-      />
-    </React.Fragment>
-  );
 
-  textRecognized = object => {
-    const { textBlocks } = object;
-    this.setState({ textBlocks });
-  };
-
-  barcodeRecognized = ({ barcodes }) => this.setState({ barcodes });
-
-  renderBarcodes = () => (
-    <View style={styles.facesContainer} pointerEvents="none">
-      {this.state.barcodes.map(this.renderBarcode)}
-    </View>
-  );
-
-  renderBarcode = ({ bounds, data, type }) => (
-    <React.Fragment key={data + bounds.origin.x}>
-      <View
-        style={[
-          styles.text,
-          {
-            ...bounds.size,
-            left: bounds.origin.x,
-            top: bounds.origin.y,
-          },
-        ]}
-      >
-        <Text style={[styles.textBlock]}>{`${data} ${type}`}</Text>
-      </View>
-    </React.Fragment>
-  );
 
   renderCamera() {
     const { canDetectFaces, canDetectText, canDetectBarcode } = this.state;
@@ -276,127 +154,40 @@ export default class CameraScreen extends React.Component {
           RNCamera.Constants.GoogleVisionBarcodeDetection.BarcodeMode.ALTERNATE
         }
       >
+        
         <View
           style={{
             flex: 0.5,
           }}
         >
-          <View
-            style={{
-              backgroundColor: 'transparent',
-              flexDirection: 'row',
-              justifyContent: 'space-around',
-            }}
-          >
-            <TouchableOpacity style={styles.flipButton} onPress={this.toggleFacing.bind(this)}>
-              <Text style={styles.flipText}> FLIP </Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.flipButton} onPress={this.toggleFlash.bind(this)}>
-              <Text style={styles.flipText}> FLASH: {this.state.flash} </Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.flipButton} onPress={this.toggleWB.bind(this)}>
-              <Text style={styles.flipText}> WB: {this.state.whiteBalance} </Text>
-            </TouchableOpacity>
-          </View>
-          <View
-            style={{
-              backgroundColor: 'transparent',
-              flexDirection: 'row',
-              justifyContent: 'space-around',
-            }}
-          >
-            <TouchableOpacity onPress={this.toggle('canDetectFaces')} style={styles.flipButton}>
-              <Text style={styles.flipText}>
-                {!canDetectFaces ? 'Detect Faces' : 'Detecting Faces'}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={this.toggle('canDetectText')} style={styles.flipButton}>
-              <Text style={styles.flipText}>
-                {!canDetectText ? 'Detect Text' : 'Detecting Text'}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={this.toggle('canDetectBarcode')} style={styles.flipButton}>
-              <Text style={styles.flipText}>
-                {!canDetectBarcode ? 'Detect Barcode' : 'Detecting Barcode'}
-              </Text>
-            </TouchableOpacity>
-          </View>
         </View>
+
+        
+        {/* spasing / kosong biar ada jarak dari yang atas dan yang bawah */}
         <View
           style={{
             flex: 0.4,
-            backgroundColor: 'transparent',
+            backgroundColor: '#transparent',
             flexDirection: 'row',
             alignSelf: 'flex-end',
           }}
         >
         </View>
+        {/* akhir spasing */}
+
+        {/* awal bar yang bawah */}
         <View
           style={{
-            flex: 0.1,
-            backgroundColor: 'transparent',
+            flex: 0.15,
+            backgroundColor: '#FF0000',
             flexDirection: 'row',
-            alignSelf: 'flex-end',
           }}
         >
-          <TouchableOpacity
-            style={[
-              styles.flipButton,
-              {
-                flex: 0.3,
-                alignSelf: 'flex-end',
-                backgroundColor: this.state.isRecording ? 'white' : 'darkred',
-              },
-            ]}
-            onPress={this.state.isRecording ? () => {} : this.takeVideo.bind(this)}
-          >
-            {this.state.isRecording ? (
-              <Text style={styles.flipText}> ☕ </Text>
-            ) : (
-              <Text style={styles.flipText}> REC </Text>
-            )}
-          </TouchableOpacity>
+          <Text>Halo Sayang</Text>
         </View>
-        {this.state.zoom !== 0 && (
-          <Text style={[styles.flipText, styles.zoomText]}>Zoom: {this.state.zoom}</Text>
-        )}
-        <View
-          style={{
-            flex: 0.1,
-            backgroundColor: 'transparent',
-            flexDirection: 'row',
-            alignSelf: 'flex-end',
-          }}
-        >
-          <TouchableOpacity
-            style={[styles.flipButton, { flex: 0.1, alignSelf: 'flex-end' }]}
-            onPress={this.zoomIn.bind(this)}
-          >
-            <Text style={styles.flipText}> + </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.flipButton, { flex: 0.1, alignSelf: 'flex-end' }]}
-            onPress={this.zoomOut.bind(this)}
-          >
-            <Text style={styles.flipText}> - </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.flipButton, { flex: 0.25, alignSelf: 'flex-end' }]}
-            onPress={this.toggleFocus.bind(this)}
-          >
-            <Text style={styles.flipText}> AF : {this.state.autoFocus} </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.flipButton, styles.picButton, { flex: 0.3, alignSelf: 'flex-end' }]}
-            onPress={this.takePicture.bind(this)}
-          >
-            <Text style={styles.flipText}> SNAP </Text>
-          </TouchableOpacity>
-        </View>
+        {/* akhir bar yang bawah */}
         {!!canDetectFaces && this.renderFaces()}
         {!!canDetectFaces && this.renderLandmarks()}
-        {!!canDetectText && this.renderTextBlocks()}
-        {!!canDetectBarcode && this.renderBarcodes()}
       </RNCamera>
     );
   }
@@ -409,7 +200,7 @@ export default class CameraScreen extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 10,
+    // paddingTop: 10,
     backgroundColor: '#000',
   },
   flipButton: {
