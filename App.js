@@ -12,28 +12,42 @@ export default class CameraScreen extends React.Component {
     type: 'front',
     canDetectFaces: 1,
     faces: [],
-    jmlFace: 0,
+    jmlIterasi: 0,
   };
 
   componentDidMount(){
     console.log('-->>componen did mount')
-    setTimeout(() => {
-      this.takePicture();
-    }, 2000);
   }
 
-  // componentDidUpdate(){
-  //   console.log(this.state.faces);
-  //   // kalau ada perubahan
-  //   setTimeout(() => {
-  //     this.takePicture();
-  //   }, 2000);
-  // }
+  componentDidUpdate(){
+    // kalau ada perubahan
+    setTimeout(() => {
+      this.setState({
+        jmlIterasi: this.state.jmlIterasi+1
+      })
+    },1000)
+    if (this.state.jmlIterasi == 20){
+      // console.log(this.state.jmlIterasi);
+      this.takePicture()
+      
+      // nanti disini diisi sama loading waktu nge capture
+    }
+    else if (this.state.jmlIterasi < 20){
+      console.log(this.state.faces);
+    }
+  }
 
 
   takePicture = async function() {
     if (this.camera) {
-      const img = await this.camera.takePictureAsync();
+      const options = {
+        quality: 1,
+        orientation: 0,
+        base64: true,
+        pauseAfterCapture: true,
+        fixOrientation: true,
+      }
+      const img = await this.camera.takePictureAsync(options);
       this.setState({img})
       console.warn('takePicture ', img);
       // membuat formdata
@@ -43,33 +57,35 @@ export default class CameraScreen extends React.Component {
       body.append('img', {uri: img.uri, name: 'img.jpg', type: 'image/jpeg'});
       
       // fetch ke api untuk upload gambar
-      fetch('http://192.168.8.104/codeigniter/upload.php',{
+      fetch('http://192.168.8.104:5000/uploader',{
         method: 'post',
         // headers: {
         //   'Content-Type': 'undefined'
         // },
         body,
-      }).then(a => a.json()).then(res => console.log(res));
+      })
+      .then(a => a.text())
+      .then(res => console.log(res));
       console.log(img.uri)
     }
   };
 
-  upload(){
-    // membuat formdata
-    const body = new FormData();
+  // upload(){
+  //   // membuat formdata
+  //   const body = new FormData();
     
-    // mengambil img yang disimpan di state
-    body.append('img', {uri: this.state.img.uri, name: 'img.jpg', type: 'image/jpeg'});
+  //   // mengambil img yang disimpan di state
+  //   body.append('img', {uri: this.state.img.uri, name: 'img.jpg', type: 'image/jpeg'});
     
-    // fetch ke api untuk upload gambar
-    fetch('http://localhost/codeigniter/upload.php',{
-      method: 'post',
-      // headers: {
-      //   'Content-Type': 'undefined'
-      // },
-      body
-    }).then(a => a.json()).then(res => alert(res));
-  }
+  //   // fetch ke api untuk upload gambar
+  //   fetch('http://192.168.8.104:5000/uploader',{
+  //     method: 'post',
+  //     // headers: {
+  //     //   'Content-Type': 'undefined'
+  //     // },
+  //     body
+  //   }).then(a => a.json()).then(res => alert(res));
+  // }
 
   toggle = value => () => this.setState(prevState => ({ [value]: !prevState[value] }));
 
