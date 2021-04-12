@@ -15,21 +15,61 @@ export default class CameraScreen extends React.Component {
     jmlFace: 0,
   };
 
-  componentDidUpdate(){
-    console.log(this.state.faces);
-    // kalau ada perubahan
+  componentDidMount(){
+    console.log('-->>componen did mount')
     setTimeout(() => {
       this.takePicture();
     }, 2000);
   }
 
+  // componentDidUpdate(){
+  //   console.log(this.state.faces);
+  //   // kalau ada perubahan
+  //   setTimeout(() => {
+  //     this.takePicture();
+  //   }, 2000);
+  // }
+
 
   takePicture = async function() {
     if (this.camera) {
-      const data = await this.camera.takePictureAsync();
-      console.warn('takePicture ', data);
+      const img = await this.camera.takePictureAsync();
+      this.setState({img})
+      console.warn('takePicture ', img);
+      // membuat formdata
+      const body = new FormData();
+      
+      // mengambil img yang disimpan di state
+      body.append('img', {uri: img.uri, name: 'img.jpg', type: 'image/jpeg'});
+      
+      // fetch ke api untuk upload gambar
+      fetch('http://192.168.8.104/codeigniter/upload.php',{
+        method: 'post',
+        // headers: {
+        //   'Content-Type': 'undefined'
+        // },
+        body,
+      }).then(a => a.json()).then(res => console.log(res));
+      console.log(img.uri)
     }
   };
+
+  upload(){
+    // membuat formdata
+    const body = new FormData();
+    
+    // mengambil img yang disimpan di state
+    body.append('img', {uri: this.state.img.uri, name: 'img.jpg', type: 'image/jpeg'});
+    
+    // fetch ke api untuk upload gambar
+    fetch('http://localhost/codeigniter/upload.php',{
+      method: 'post',
+      // headers: {
+      //   'Content-Type': 'undefined'
+      // },
+      body
+    }).then(a => a.json()).then(res => alert(res));
+  }
 
   toggle = value => () => this.setState(prevState => ({ [value]: !prevState[value] }));
 
